@@ -12,7 +12,7 @@ export default function ResultModal({ handleClose, open, data }: ResultModalProp
   const [copied, setCopied] = useState(false);
   
   const handleCopy = async () => {
-    if (!copied) {
+    if (!copied && data) {
       try {
         await navigator.clipboard.writeText(data.shortened);
         setCopied(true);
@@ -26,7 +26,7 @@ export default function ResultModal({ handleClose, open, data }: ResultModalProp
   };
   
   const handleShare = async (): Promise<void> => {
-    if (navigator.share) {
+    if (navigator.share && data) {
       try {
         await navigator.share({
           title: "ShortRL Share",
@@ -52,9 +52,9 @@ export default function ResultModal({ handleClose, open, data }: ResultModalProp
         </button>
         </div>
         <div className="flex justify-center items-center mt-5 flex-col">
-          <img src={data.qr_code} alt="QR" />
+          <img src={data?.qr_code} alt="QR" />
           <div className="w-full h-0 border border-gray-200 my-5 mx-20"></div>
-          <input type="url" value={data.shortened} className ="outline-none border-none py-3 px-4 rounded-lg w-full md:py-4 text-emerald-400 ring-1 ring-emerald-400" disabled />
+          <input type="url" value={data?.shortened} className ="outline-none border-none py-3 px-4 rounded-lg w-full md:py-4 text-emerald-400 ring-1 ring-emerald-400" disabled />
           <div className="mt-7 mb-4 w-full space-y-4">
             <div className="grid grid-cols-2 space-x-2">
             <button onClick={handleShare} className="bg-emerald-400 py-3 px-4 text-white rounded-lg hover:bg-emerald-400/90 transition-all duration-300 flex justify-center items-center flex-row space-x-2">
