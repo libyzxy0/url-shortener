@@ -2,13 +2,17 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ResultModal from '@/components/ResultModal'
 import AboutSection from '@/sections/AboutSection'
-import { Clipboard, CircleFadingPlus } from 'lucide-react'
+import { Clipboard, CircleFadingPlus, LoaderCircle } from 'lucide-react'
 import { useState } from 'react'
-
+import axios from 'axios'
+import { API_BASE } from '@/constants'
+import type { URLData } from '@/types'
 
 export default function App() {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [result, setResult] = useState<URLData | null>(null);
+  const [loading, setLoading] = useState(false);
   
   const handlePaste = async () => {
     try {
@@ -17,14 +21,41 @@ export default function App() {
       }
       const clipboard = await navigator.clipboard.readText();
       setUrl(clipboard);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error)
     }
   }
   
+  const handleGenerate = async () => {
+    try {
+      if(!url) {
+        return alert('Please provide a link')
+      }
+      setLoading(true);
+      const {data} = await axios.post(API_BASE+'/api/v1/generate', {
+        url
+      })
+      if(data) {
+        setResult(data?.data);
+      }
+      setOpen(true);
+    } catch (error) {
+      console.error("Error:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  const handleReset = () => {
+    setResult(null);
+    setUrl("");
+    setOpen(false);
+  }
   return (
     <>
-      <ResultModal open={open} handleClose={() => setOpen(false)} />
+      {result && (
+      <ResultModal open={open} handleClose={() => handleReset()} data={result ? result : null} />
+      )}
+      
       <Navbar />
       <section className="bg-white">
       <div className="bg-[url('/15441912_5591513.svg')] bg-cover w-full py-12 md:py-16 text-center flex justify-center items-center flex-col space-y-3 md:space-y-4">
@@ -46,11 +77,19 @@ export default function App() {
             </button>
           </div>
           <button 
-            onClick={() => setOpen(true)}
+            onClick={handleGenerate}
             className="bg-gray-800 py-3 md:py-4 rounded w-[90%] md:w-auto text-white hover:bg-gray-800/90 transition-all duration-300 md:px-6 flex flex-row items-center justify-center space-x-2"
           >
-            <CircleFadingPlus />
-            <span>Generate</span>
+            {loading ? (
+              <>
+                <LoaderCircle className="animate-spin" />
+              </>
+            ) : (
+              <>
+                <CircleFadingPlus />
+                <span>Generate</span>
+              </>
+            )}
           </button>
         </div>
       </div>
