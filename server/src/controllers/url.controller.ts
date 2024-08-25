@@ -43,7 +43,7 @@ class URLController {
       }
       await db.update(urls).set({
         clicks: url[0].clicks + 1
-      }).where(eq(urls.id, url.id));
+      }).where(eq(urls.id, url[0].id));
       
       res.redirect(url[0].url)
     } catch (error: unknown) {
