@@ -7,6 +7,9 @@ import { useState } from 'react'
 import axios from 'axios'
 import { API_BASE } from '@/constants'
 import type { URLData } from '@/types'
+import toast from 'react-hot-toast';
+
+const urlOrDomainRegex = /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(\/.*)?$/;
 
 export default function App() {
   const [open, setOpen] = useState(false);
@@ -29,7 +32,26 @@ export default function App() {
   const handleGenerate = async () => {
     try {
       if(!url) {
-        return alert('Please provide a link')
+        return toast('Please enter a url!',
+        {
+          icon: '☹️',
+          style: {
+            borderRadius: '10px',
+            background: '#f9fafb',
+            color: '#1f2937',
+          },
+        });
+      }
+
+      if (!urlOrDomainRegex.test(url)) {
+        return toast('Please enter a valid URL or domain!', {
+          icon: '☹️',
+          style: {
+            borderRadius: '10px',
+            background: '#f9fafb',
+            color: '#1f2937',
+          },
+        });
       }
       setLoading(true);
       const {data} = await axios.post(API_BASE+'/api/v1/generate', {
@@ -37,6 +59,15 @@ export default function App() {
       })
       if(data) {
         setResult(data?.data);
+        toast('Url shortened successfully!',
+        {
+          icon: '🎉',
+          style: {
+            borderRadius: '10px',
+            background: '#f9fafb',
+            color: '#1f2937',
+          },
+        });
       }
       setOpen(true);
     } catch (error) {
@@ -66,7 +97,7 @@ export default function App() {
           <div className="w-[90%] md:w-[27rem] relative">
              <input 
              type="url"
-            className="outline-none border-none py-3 px-4 rounded-lg w-full md:py-4 text-gray-800 ring-0 focus-visible:ring-2 focus-visible:ring-gray-700" 
+            className="outline-none border-none py-3 pl-4 pr-[6.5rem] rounded-lg w-full md:py-4 text-gray-800 ring-0 focus-visible:ring-2 focus-visible:ring-gray-700" 
             placeholder="Paste your long link here." 
             onChange={(e) => setUrl(e.target.value)}
             value={url}

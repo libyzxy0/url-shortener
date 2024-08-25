@@ -28,7 +28,7 @@ export default function Footer() {
             </li>
             <li>
               <Link to="https://www.libyzxy0.com" className="hover:underline">
-                Developer Contact
+                Developer
               </Link>
             </li>
           </ul>
