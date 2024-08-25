@@ -42,10 +42,12 @@ class URLController {
         })
       }
       await db.update(urls).set({
-        clicks: url.clicks + 1
+        clicks: url[0].clicks + 1
       }).where(eq(urls.id, url.id));
+      
       res.redirect(url[0].url)
     } catch (error: unknown) {
+      console.log(error)
       res.status(500).json({ 
         error: "Failed to get url, something went wrong"
       })
