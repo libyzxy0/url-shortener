@@ -9,8 +9,8 @@ router.route("/").get((req: Request, res: Response) => {
 });
 
 router.route("/api/v1/generate").post(urlController.createURL);
+router.route("/get-clicks/:id").get(urlController.getClicks);
 router.route("/:id").get(urlController.redirect);
-
 /* Initialize router */
 export const initializeRoutes = (app: Application) =>
   app.use(API_VERSION, router);

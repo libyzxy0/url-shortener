@@ -35,13 +35,33 @@ class URLController {
   async redirect(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const product = await db.select().from(urls).where(eq(urls.uid, id));
-      if(product.length <= 0) {
+      const url = await db.select().from(urls).where(eq(urls.uid, id));
+      if(url.length <= 0) {
         return res.status(404).json({
           error: "No url associated with that ID"
         })
       }
-      res.redirect(product[0].url)
+      await db.update(urls).set({
+        clicks: url.clicks + 1
+      }).where(eq(urls.id, url.id));
+      res.redirect(url[0].url)
+    } catch (error: unknown) {
+      res.status(500).json({ 
+        error: "Failed to get url, something went wrong"
+      })
+    }
+  }
+  
+  async getClicks(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const url = await db.select().from(urls).where(eq(urls.uid, id));
+      if(url.length <= 0) {
+        return res.status(404).json({
+          error: "No url associated with that ID"
+        })
+      }
+      res.status(200).json({ clicks: url[0].clicks })
     } catch (error: unknown) {
       res.status(500).json({ 
         error: "Failed to get url, something went wrong"
